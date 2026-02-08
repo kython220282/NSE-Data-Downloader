@@ -1,0 +1,6 @@
+# NSE Data Downloader - Required Packages
+# Install with: uv pip install -r requirements.txt
+
+streamlit>=1.54.0
+pandas>=2.3.3
+requests>=2.32.5
