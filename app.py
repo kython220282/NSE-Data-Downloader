@@ -90,6 +90,7 @@ def download_stock_data(symbol, from_date_obj, to_date_obj, progress_bar, status
     successful_downloads = 0
     current_date = from_date_obj
     total_days = (to_date_obj - from_date_obj).days
+    errors = []
     
     while current_date <= to_date_obj:
         date_str = current_date.strftime('%d-%m-%Y')
@@ -115,12 +116,16 @@ def download_stock_data(symbol, from_date_obj, to_date_obj, progress_bar, status
                         'Volume': row['TTL_TRD_QNTY']
                     })
                     successful_downloads += 1
-        except:
-            pass
+        except Exception as e:
+            if len(errors) < 3:  # Store first 3 errors for diagnostics
+                errors.append(f"{date_str}: {str(e)}")
         
         current_date += timedelta(days=1)
         if successful_downloads % 5 == 0:
             time.sleep(0.1)
+    
+    if errors and successful_downloads == 0:
+        st.warning(f"⚠️ Sample errors: {errors[0]}")
     
     return pd.DataFrame(all_data) if all_data else None
 
@@ -131,6 +136,7 @@ def download_index_data(symbol, from_date_obj, to_date_obj, progress_bar, status
     successful_downloads = 0
     current_date = from_date_obj
     total_days = (to_date_obj - from_date_obj).days
+    errors = []
     
     # Normalize the symbol to match NSE naming conventions
     normalized_symbol = normalize_index_name(symbol)
@@ -164,12 +170,16 @@ def download_index_data(symbol, from_date_obj, to_date_obj, progress_bar, status
                         'Volume': row['Volume']
                     })
                     successful_downloads += 1
-        except:
-            pass
+        except Exception as e:
+            if len(errors) < 3:  # Store first 3 errors for diagnostics
+                errors.append(f"{date_str}: {str(e)}")
         
         current_date += timedelta(days=1)
         if successful_downloads % 5 == 0:
             time.sleep(0.1)
+    
+    if errors and successful_downloads == 0:
+        st.warning(f"⚠️ Sample errors: {errors[0]}")
     
     return pd.DataFrame(all_data) if all_data else None
 
@@ -237,7 +247,7 @@ with col1:
         help="Choose data frequency"
     )
     timeframe_code = timeframe.split()[0]
-    download_button = st.button("Download Data", type="primary", use_container_width=False)
+    download_button = st.button("Download Data", type="primary", width="content")
 
 with col2:
     st.subheader("📋 Download Settings")
@@ -351,7 +361,7 @@ if st.session_state.downloaded_data is not None:
         st.metric("Lowest", f"{df['Close'].min():.2f}")
         
     # Data table
-    st.dataframe(df, use_container_width=True, height=300)
+    st.dataframe(df, width="stretch", height=300)
     
     # Download button
     csv_buffer = io.StringIO()
@@ -364,11 +374,11 @@ if st.session_state.downloaded_data is not None:
         file_name=st.session_state.filename,
         mime="text/csv",
         type="primary",
-        use_container_width=True
+        width="stretch"
     )
     
     # Clear button
-    if st.button("🔄 Start New Download", use_container_width=True):
+    if st.button("🔄 Start New Download", width="stretch"):
         st.session_state.downloaded_data = None
         st.session_state.filename = None
         st.rerun()

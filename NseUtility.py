@@ -42,18 +42,22 @@ class NseUtils:
     def __init__(self):
 
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Upgrade-Insecure-Requests': "1",
             "DNT": "1",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*,q=0.8",
             'Accept-Language': 'en-US,en;q=0.9',
-            # 'Accept-Encoding': 'gzip, deflate, br, zstd',
             'Accept-Encoding': 'gzip, deflate',
-            'Connection': 'keep-alive'
+            'Connection': 'keep-alive',
+            'Referer': 'https://www.nseindia.com'
         }
 
         self.session = requests.Session()
-        self.session.get("http://nseindia.com", headers=self.headers)
+        # Initialize session with NSE homepage to get cookies
+        try:
+            self.session.get("https://www.nseindia.com", headers=self.headers, timeout=10)
+        except:
+            pass  # Continue even if initial request fails
         self.cookies = self.session.cookies.get_dict()
 
     def pre_market_info(self, category='All'):
@@ -311,7 +315,7 @@ class NseUtils:
         trade_date = datetime.strptime(trade_date, "%d-%m-%Y")
         url = 'https://nsearchives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_'
         payload = f"{str(trade_date.strftime('%Y%m%d'))}_F_0000.csv.zip"
-        request_bhav = requests.get(url + payload, headers=self.headers)
+        request_bhav = self.session.get(url + payload, headers=self.headers, cookies=self.cookies)
         bhav_df = pd.DataFrame()
 
         if request_bhav.status_code == 200:
@@ -324,7 +328,7 @@ class NseUtils:
                    "%5B%7B%22name%22%3A%22F%26O%20-%20Bhavcopy(csv)%22%2C%22type%22%3A%22archives%22%2C%22category%22" \
                    f"%3A%22derivatives%22%2C%22section%22%3A%22equity%22%7D%5D&date={str(trade_date.strftime('%d-%b-%Y'))}" \
                    f"&type=equity&mode=single"
-            request_bhav = requests.get(url2 + payload, headers=self.headers)
+            request_bhav = self.session.get(url2 + payload, headers=self.headers, cookies=self.cookies)
             if request_bhav.status_code == 200:
                 zip_bhav = zipfile.ZipFile(BytesIO(request_bhav.content), 'r')
                 for file_name in zip_bhav.filelist:
@@ -344,7 +348,9 @@ class NseUtils:
         trade_date = datetime.strptime(trade_date, "%d-%m-%Y")
         use_date = trade_date.strftime("%d%m%Y")
         url = f'https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_{use_date}.csv'
-        request_bhav = requests.get(url, headers=self.headers)
+        
+        # Use session to maintain cookies
+        request_bhav = self.session.get(url, headers=self.headers, cookies=self.cookies)
         if request_bhav.status_code == 200:
             bhav_df = pd.read_csv(BytesIO(request_bhav.content))
         else:
@@ -364,7 +370,7 @@ class NseUtils:
         # trade_date = datetime.strptime(trade_date, dd_mm_yyyy)
         url = 'https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_'
         payload = f"{str(trade_date.strftime('%Y%m%d'))}_F_0000.csv.zip"
-        request_bhav = requests.get(url + payload, headers=self.headers)
+        request_bhav = self.session.get(url + payload, headers=self.headers, cookies=self.cookies)
         bhav_df = pd.DataFrame()
         if request_bhav.status_code == 200:
             zip_bhav = zipfile.ZipFile(BytesIO(request_bhav.content), 'r')
@@ -383,8 +389,9 @@ class NseUtils:
         """
         trade_date = datetime.strptime(trade_date, "%d-%m-%Y")
         url = f"https://nsearchives.nseindia.com/content/indices/ind_close_all_{str(trade_date.strftime('%d%m%Y').upper())}.csv"
-        # nse_resp = nse_urlfetch(url)
-        nse_resp = requests.get(url, headers=self.headers)
+        
+        # Use session to maintain cookies
+        nse_resp = self.session.get(url, headers=self.headers, cookies=self.cookies)
         if nse_resp.status_code != 200:
             raise FileNotFoundError(f" No data available for : {trade_date}")
         try:

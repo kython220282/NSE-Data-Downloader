@@ -12,6 +12,15 @@ GitHub Repository: https://github.com/kython220282/NSE-Data-Downloader
 
 Try the application on: https://nse-data-downloader.streamlit.app/
 
+## Recent Updates (Streamlit Cloud Fix)
+
+**Fixed:** Data download issues on Streamlit Cloud deployment
+- Updated NSE API requests to properly maintain session cookies
+- Enhanced User-Agent headers for better compatibility
+- Added Referer header to prevent blocking
+- Improved error handling with diagnostic messages
+- All bhav copy methods now use session object for consistent authentication
+
 ## Features
 
 - Download data for stocks, indices, and ETFs from NSE India
