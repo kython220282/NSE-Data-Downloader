@@ -6,7 +6,7 @@ GitHub Repository: https://github.com/kython220282/NSE-Data-Downloader
 
 ## Screenshot
 
-![NSE Data Downloader Application](capture.png)
+![NSE Data Downloader Application](Capture.PNG)
 
 ## Live Demo
 
