@@ -312,7 +312,7 @@ if download_button:
                 # Store in session state
                 st.session_state.downloaded_data = df
                 actual_symbol = df['Symbol'].iloc[0].replace(' ', '_').replace('/', '_')
-                st.session_state.filename = f"{actual_symbol}_{timeframe_code}_{from_date.strftime('%Y%m%d')}_to_{to_date.strftime('%Y%m%d')}.csv"
+                st.session_state.filename = f"{actual_symbol}.csv"
                 
                 st.success(f"✅ Successfully downloaded {len(df)} records!")
                 
