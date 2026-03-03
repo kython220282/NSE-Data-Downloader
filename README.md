@@ -2,15 +2,13 @@
 
 Download historical OHLC (Open, High, Low, Close) data for NSE stocks, indices, and ETFs. Timeframes supported: Daily (1d), Weekly (1w), Monthly (1m)
 
-GitHub Repository:https://nse-datadownloader.streamlit.app/
-
 ## Screenshot
 
 ![NSE Data Downloader Application](Capture.PNG)
 
 ## Live Demo
 
-Try the application on: https://nse-data-downloader.streamlit.app/
+Try the application on: [https://nse-data-downloader.streamlit.app/](https://nse-datadownloader.streamlit.app/)
 
 ## Recent Updates (Streamlit Cloud Fix)
 
