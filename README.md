@@ -2,7 +2,7 @@
 
 Download historical OHLC (Open, High, Low, Close) data for NSE stocks, indices, and ETFs. Timeframes supported: Daily (1d), Weekly (1w), Monthly (1m)
 
-GitHub Repository: https://github.com/kython220282/NSE-Data-Downloader
+GitHub Repository:https://nse-datadownloader.streamlit.app/
 
 ## Screenshot
 
