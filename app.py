@@ -296,6 +296,7 @@ with col2:
     st.info(f"📊 Estimated records: ~{estimated_records}")
     st.markdown("---")
     st.write("⚠️ Note: Download time may vary based on date range and NSE server response.")
+    st.write("⚠️ For educational purposes only. Requires NSE approval for commercial use.")
 
 
 # Session state to store data
@@ -406,11 +407,11 @@ if st.session_state.downloaded_data is not None:
         st.session_state.filename = None
         st.rerun()
 
+st.write("Scroll down to view/download data after clicking 'Download Data' button.")
 # Footer
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: gray;'>
     <p>NSE Data Downloader | Powered by NseUtility | Data from NSE India</p>
-    <p style='font-size: 0.8em;'>⚠️ For educational purposes only. Requires NSE approval for commercial use.</p>
 </div>
 """, unsafe_allow_html=True)
