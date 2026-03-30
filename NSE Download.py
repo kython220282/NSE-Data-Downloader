@@ -1,13 +1,3 @@
-# -------------------------------------------------------------------------
-#              FabTrader Algorithmic Trading - Tutorials
-# -------------------------------------------------------------------------
-# CONTACT:
-# - Website: https://fabtrader.in
-# - Email: fabtraderinc@gmail.com
-#
-# Usage: Educational Purposes & training use only. Not for commercial redistribution.
-# ------------------------------------------------------------------------
-
 import NseUtility
 import pandas as pd
 from pprint import pprint

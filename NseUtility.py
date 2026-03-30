@@ -1,18 +1,3 @@
-"""
-    * NSE UTILITY *
-
-    Description: This utility is Python Library to get publicly available data on new NSE india website
-
-    Disclaimer : This utility is meant for educational purposes only. Downloading data from NSE
-    website requires explicit approval from the exchange. Hence, the usage of this utility is for
-    limited purposes only under proper/explicit approvals.
-
-    Requirements : Following packages are to be installed (using pip) prior to using this utility
-    - pandas
-    - python 3.8 and above
-
-"""
-
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
