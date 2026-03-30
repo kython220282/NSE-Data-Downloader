@@ -235,9 +235,6 @@ class NseUtils:
 
         url = 'https://www.nseindia.com/api/quote-derivative?symbol=' + symbol
         data = self.session.get(url, headers=self.headers, cookies=ref.cookies.get_dict()).json()
-        print(url)
-        from pprint import pprint
-        pprint(data)
         lst = []
         for i in data["stocks"]:
             if i["metadata"]["instrumentType"] == ("Index Futures" if indices else "Stock Futures"):
@@ -593,8 +590,6 @@ class NseUtils:
         except Exception as e:
             raise Exception(f"Resource not available: {e}")
 
-        data_df.drop(columns='TIMESTAMP', inplace=True)
-
         unwanted_str_list = ['FH_', 'EOD_', 'HIT_']
         new_col = data_df.columns
         for unwanted in unwanted_str_list:
@@ -637,7 +632,7 @@ class NseUtils:
         response = requests.get(url, headers=self.headers, cookies=ref.cookies.get_dict())
 
         if response.status_code != 200:
-            raise ("Resource not available for fno_equity_list")
+            raise RuntimeError("Resource not available for fno_equity_list")
         data_dict = response.json()
         data_df = pd.DataFrame(data_dict['data']['UnderlyingList'])
         if list_only:
@@ -655,7 +650,7 @@ class NseUtils:
         url = 'https://www.nseindia.com/api/live-analysis-variations?index=gainers'
         data_obj = requests.get(url, headers=self.headers, cookies=ref.cookies.get_dict())
         if data_obj.status_code != 200:
-            raise ("Resource not available for fno_equity_list")
+            raise RuntimeError("Resource not available for fno_equity_list")
         data_dict = data_obj.json()
 
         # Nifty Gainer
@@ -681,7 +676,7 @@ class NseUtils:
         url = 'https://www.nseindia.com/api/live-analysis-variations?index=loosers'
         data_obj = self.session.get(url, headers=self.headers, cookies=ref.cookies.get_dict())
         if data_obj.status_code != 200:
-            raise ("Resource not available for fno_equity_list")
+            raise RuntimeError("Resource not available for fno_equity_list")
         data_dict = data_obj.json()
 
         # Nifty Gainer

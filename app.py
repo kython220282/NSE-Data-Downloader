@@ -47,41 +47,53 @@ def normalize_index_name(name):
     
     return ' '.join(normalized_words)
 
-def resample_to_weekly(df):
-    """Convert daily data to weekly data."""
-    df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y')
-    df.set_index('Date', inplace=True)
-    
-    weekly = df.resample('W-FRI').agg({
+def _prepare_ohlcv_for_resample(df):
+    """Clean and normalize OHLCV fields before time aggregation."""
+    clean_df = df.copy()
+    clean_df['Date'] = pd.to_datetime(clean_df['Date'], format='%d-%m-%Y', errors='coerce')
+    for col in ['Open', 'High', 'Low', 'Close', 'Volume']:
+        clean_df[col] = pd.to_numeric(clean_df[col], errors='coerce')
+    clean_df = clean_df.dropna(subset=['Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
+    clean_df = clean_df.sort_values('Date')
+    return clean_df
+
+def _resample_ohlcv(df, rule):
+    """Resample OHLCV while preserving the symbol column."""
+    clean_df = _prepare_ohlcv_for_resample(df)
+    if clean_df.empty:
+        return pd.DataFrame(columns=['Symbol', 'Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
+
+    symbol_name = clean_df['Symbol'].iloc[0] if 'Symbol' in clean_df.columns else ''
+    clean_df = clean_df.set_index('Date')
+
+    sampled = clean_df.resample(rule).agg({
         'Open': 'first',
         'High': 'max',
         'Low': 'min',
         'Close': 'last',
         'Volume': 'sum'
     })
-    
-    weekly = weekly.dropna()
-    weekly.reset_index(inplace=True)
-    weekly['Date'] = weekly['Date'].dt.strftime('%d-%m-%Y')
-    return weekly
+
+    sampled = sampled.dropna().reset_index()
+    sampled['Date'] = sampled['Date'].dt.strftime('%d-%m-%Y')
+    sampled.insert(0, 'Symbol', symbol_name)
+    return sampled[['Symbol', 'Date', 'Open', 'High', 'Low', 'Close', 'Volume']]
+
+def resample_to_weekly(df):
+    """Convert daily data to weekly data."""
+    return _resample_ohlcv(df, 'W-FRI')
 
 def resample_to_monthly(df):
     """Convert daily data to monthly data."""
-    df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y')
-    df.set_index('Date', inplace=True)
-    
-    monthly = df.resample('M').agg({
-        'Open': 'first',
-        'High': 'max',
-        'Low': 'min',
-        'Close': 'last',
-        'Volume': 'sum'
-    })
-    
-    monthly = monthly.dropna()
-    monthly.reset_index(inplace=True)
-    monthly['Date'] = monthly['Date'].dt.strftime('%d-%m-%Y')
-    return monthly
+    return _resample_ohlcv(df, 'ME')
+
+def resample_to_quarterly(df):
+    """Convert daily data to quarterly data (calendar quarter)."""
+    return _resample_ohlcv(df, 'QE-DEC')
+
+def resample_to_yearly(df):
+    """Convert daily data to yearly data (calendar year)."""
+    return _resample_ohlcv(df, 'YE-DEC')
 
 def download_stock_data(symbol, from_date_obj, to_date_obj, progress_bar, status_text):
     """Download stock data from equity bhav copy."""
@@ -186,6 +198,7 @@ def download_index_data(symbol, from_date_obj, to_date_obj, progress_bar, status
 # App title and description
 st.title("📊 NSE Historical Data Downloader")
 st.markdown("Download historical OHLC data for NSE stocks, indices, and ETFs")
+st.markdown("Application support for daily, weekly, monthly, quarterly, and yearly data frequencies")
 
 # Create two columns for layout
 col1, col2 = st.columns([1, 1])
@@ -228,7 +241,7 @@ with col1:
     with col_from:
         from_date = st.date_input(
             "From Date:",
-            value=datetime.now() - timedelta(days=30),
+            value=datetime.now() - timedelta(days=365),
             max_value=datetime.now()
         )
     
@@ -243,7 +256,7 @@ with col1:
     st.markdown("#### ⏱️ Timeframe")
     timeframe = st.selectbox(
         "Select Timeframe:",
-        ["1d (Daily)", "1w (Weekly)", "1m (Monthly)"],
+        ["1d (Daily)", "1w (Weekly)", "1m (Monthly)", "1q (Quarterly)", "1y (Yearly)"],
         help="Choose data frequency"
     )
     timeframe_code = timeframe.split()[0]
@@ -275,6 +288,10 @@ with col2:
         estimated_records = estimated_records // 5
     elif timeframe_code == '1m':
         estimated_records = estimated_records // 20
+    elif timeframe_code == '1q':
+        estimated_records = estimated_records // 60
+    elif timeframe_code == '1y':
+        estimated_records = estimated_records // 240
     
     st.info(f"📊 Estimated records: ~{estimated_records}")
     st.markdown("---")
@@ -315,6 +332,12 @@ if download_button:
                 elif timeframe_code == '1m':
                     status_text.text("Resampling to monthly data...")
                     df = resample_to_monthly(df)
+                elif timeframe_code == '1q':
+                    status_text.text("Resampling to quarterly data...")
+                    df = resample_to_quarterly(df)
+                elif timeframe_code == '1y':
+                    status_text.text("Resampling to yearly data...")
+                    df = resample_to_yearly(df)
                 
                 progress_bar.progress(1.0)
                 status_text.text(f"✅ Complete! Downloaded {len(df)} records")

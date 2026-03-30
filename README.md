@@ -1,6 +1,6 @@
 # NSE Historical Data Downloader
 
-Download historical OHLC (Open, High, Low, Close) data for NSE stocks, indices, and ETFs. Timeframes supported: Daily (1d), Weekly (1w), Monthly (1m)
+Download historical OHLC (Open, High, Low, Close) data for NSE stocks, indices, and ETFs. Timeframes supported: Daily (1d), Weekly (1w), Monthly (1m), Quarterly (1q), Yearly (1y)
 
 ## Screenshot
 
@@ -22,7 +22,7 @@ Try the application on: [https://nse-data-downloader.streamlit.app/](https://nse
 ## Features
 
 - Download data for stocks, indices, and ETFs from NSE India
-- Multiple timeframes: Daily (1d), Weekly (1w), Monthly (1m)
+- Multiple timeframes: Daily (1d), Weekly (1w), Monthly (1m), Quarterly (1q), Yearly (1y)
 - Web-based UI (Streamlit) or Command-line interface
 - Auto-normalization of index names for NSE format
 - Progress tracking during downloads
@@ -92,6 +92,8 @@ The application will open in your browser at http://localhost:8501
    - 1d (Daily): Raw daily data
    - 1w (Weekly): Aggregated weekly data
    - 1m (Monthly): Aggregated monthly data
+   - 1q (Quarterly): Aggregated calendar quarter data
+   - 1y (Yearly): Aggregated calendar year data
 
 5. Click "Download Data" button
 
@@ -135,9 +137,11 @@ The script will ask for the following inputs:
    - Enter date in DD-MM-YYYY format (e.g., 31-12-2024)
 
 5. Timeframe:
-   - Enter "1d" for daily data
-   - Enter "1w" for weekly data
-   - Enter "1m" for monthly data
+   - Enter "1" for daily data (1d)
+   - Enter "2" for weekly data (1w)
+   - Enter "3" for monthly data (1m)
+   - Enter "4" for quarterly data (1q)
+   - Enter "5" for yearly data (1y)
 
 ### Example Session
 
@@ -156,10 +160,12 @@ Enter FROM date (DD-MM-YYYY): 01-01-2024
 Enter TO date (DD-MM-YYYY): 31-01-2024
 
 Select timeframe:
-  1d = Daily data
-  1w = Weekly data (Friday close)
-  1m = Monthly data
-Enter timeframe (1d/1w/1m): 1d
+1. Daily (1d)
+2. Weekly (1w)
+3. Monthly (1m)
+4. Quarterly (1q)
+5. Yearly (1y)
+Enter choice (1/2/3/4/5): 1
 
 Downloading data for NIFTY 50...
 Progress: 100%
@@ -226,6 +232,22 @@ Monthly Data (1m):
 - High: Highest of the month
 - Low: Lowest of the month
 - Close: Last day's close
+- Volume: Sum of daily volumes
+
+Quarterly Data (1q):
+- Aggregated to calendar quarter end (Mar/Jun/Sep/Dec)
+- Open: First day's open in the quarter
+- High: Highest of the quarter
+- Low: Lowest of the quarter
+- Close: Last day's close in the quarter
+- Volume: Sum of daily volumes
+
+Yearly Data (1y):
+- Aggregated to calendar year end (Dec)
+- Open: First day's open in the year
+- High: Highest of the year
+- Low: Lowest of the year
+- Close: Last day's close in the year
 - Volume: Sum of daily volumes
 
 ## Troubleshooting
